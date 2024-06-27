@@ -1,0 +1,50 @@
+#Codigo de inspiración
+# Base sonora
+# Tiempo definido
+use_bpm 60
+
+# Define una variable para el tiempo de inicio
+start_time = Time.now
+
+# Duración total en segundos (10 minutos)
+total_duration = 10 * 60
+
+# Verifica si la duración total ha pasado
+define :within do
+  Time.now - start_time < total_duration
+end
+
+with_fx :reverb, mix: 0.5, room: 0.8 do
+  with_fx :echo, phase: 0.25, decay: 2 do
+    
+    # Melodía Mozart
+    define :melody do
+      use_synth :piano
+      play_pattern_timed [:e4, :g4, :b4, :e5], [0.5, 0.5, 0.5, 0.5]
+      sleep rrand(3, 5)
+    end
+    
+    # Notas en Hz (C4, E4, G4 para un acorde de C mayor)
+    notes = [:c4, :e4, :g4]
+    # Duración de cada nota y silencio en segundos
+    note_duration = 0.5
+    silence_duration = 0.5
+    # Incremento del volumen en cada paso
+    volume_increase = 1.0 / notes.length
+    
+    # Loop para tocar las notas con aumento de volumen
+    live_loop :melody_increasing do
+      if within
+        notes.each_with_index do |note, i|
+          play note, amp: (volume_increase * (i + 1))
+          sleep note_duration
+          sleep silence_duration
+        end
+      else
+        # Tocar el acorde final
+        play_chord notes, amp: 1.5, sustain: 3, release: 2
+        stop
+      end
+    end
+  end
+end
