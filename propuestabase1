@@ -1,0 +1,57 @@
+# Base sonora
+use_bpm 60
+
+# Reproducir notas aleatorias durante 1 minuto con pausas aleatorias
+live_loop :random_notes do
+  use_synth :pretty_bell
+  play choose([:e4, :g4, :b4, :e5]),amp: 2,attack: 2, release: 2, chord_degrade: 1
+  sleep rrand(1, 3)
+  stop if tick >= 20  # 20 notas aleatorias (aproximadamente 1 minuto)
+end
+
+# Esperar 1 minuto antes de comenzar el siguiente bucle
+sleep 30
+
+# Tocar el acorde en un bucle con pausas de 1 segundo durante los primeros 3 minutos
+with_fx :reverb, mix: 0.5, room: 0.8 do
+  with_fx :echo, phase: 0.25, decay: 2 do
+    live_loop :chord_melody do
+      use_synth :piano
+      play_chord [:e4, :g4, :b4, :e5], release: 1, chord: 3
+      sleep 1
+      sleep 1 if tick < 180  # 180 * 1s = 3 minutos
+      stop if tick >= 600  # 600 * 1s = 10 minutos
+    end
+    
+    # Esperar 3 minutos antes de comenzar el siguiente bucle
+    sleep 180
+    
+    # Añadir arpegios inspirados en Chopin, que dejan de sonar entre el minuto 8 y el minuto 9
+    live_loop :chopin_arpeggios do
+      use_synth :pretty_bell
+      if tick < 300  # Menos de 5 minutos desde el inicio del bucle
+        play_pattern_timed chord(:e3, :m7), 0.25, release: 0.5
+        sleep 1
+      elsif tick >= 420 && tick < 540  # Entre el minuto 7 y el minuto 9 desde el inicio del bucle
+        sleep 1  # Silencio
+      elsif tick >= 300 && tick < 420  # Entre el minuto 5 y el minuto 7 desde el inicio del bucle
+        play_pattern_timed chord(:e3, :m7), 0.25, release: 0.5
+        sleep 1
+      else
+        stop
+      end
+    end
+    
+    # Esperar 8 minutos desde el inicio del código antes de comenzar el siguiente bucle
+    sleep 480
+    
+    # Descomponer el acorde en notas aleatorias para el último minuto
+    live_loop :decomposed_chord do
+      use_synth :piano
+      play choose([:e4, :g4, :b4, :e5])
+      sleep 0.5
+      stop if tick >= 120  # 120 * 0.5s = 1 minuto
+    end
+  end
+  
+end
