@@ -1,0 +1,27 @@
+# Configuración del servidor de OSC en Sonic Pi
+use_osc "192.168.43.110", 4560
+
+# Función para mapear los valores del sensor a las notas musicales entre 4 y 118
+define :map_to_note do |value|
+  # Mapea el valor de 0-1023 a 4-118
+  return (value * (118 - 4) / 1023) + 4
+end
+
+live_loop :sensor1_synth do
+  value = sync "/osc*/sensor/1"
+  note =  sync "/osc*/sensor1"
+  synth :pretty_bell , note: note, release: 0.5
+end
+
+live_loop :sensor2_synth do
+  value = sync "/osc*/sensor/2"
+  note = sync "/osc*/sensor/2"
+  synth :pretty_bell , note: note, release: 0.5
+end
+
+live_loop :sensor3_synth do
+  value = sync "/osc*/sensor/3"
+  note = sync "/osc*/sensor/3"
+  synth :pretty_bell, note: note, release: 0.5
+end
+
