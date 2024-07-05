@@ -1,0 +1,84 @@
+# Tiempo de medición
+use_bpm 60
+
+# Seleccionar archivo
+sample_path = "C:/Users/rdavi/Downloads/Nature Sound - Unleashing the Magical Symphony of the Deep.wav"
+
+
+# Tiempo de termino para de la pieza musical (20 minutos)
+total_duration = 10 * 60
+
+# Señal de comienzo
+start_time = Time.now
+
+# Señal de finalización
+define :finale do
+  Time.now - start_time < total_duration
+end
+
+with_fx :reverb, mix: 0.5, room: 0.8 do
+  with_fx :echo, phase: 0.25, decay: 2 do
+    
+    # Base de sonido extraída de carpeta (reproduce primero)
+    live_loop :base_sound do
+      if finale
+        sample sample_path, amp: 0.5
+        sleep sample_duration(sample_path)  # Duerme la duración del sample
+        stop  # Se detiene después de reproducir el archivo
+      else
+        stop
+      end
+    end
+    
+    # Espera 5 minutos antes de empezar los demás elementos
+    sleep 1 * 60
+    
+    # Melodía inspirada en Mozart
+    live_loop :mozart_melody do
+      if finale
+        use_synth :piano
+        
+        # Repetir 20 veces con pausas variables
+        5.times do
+          play_pattern_timed [:e4, :g4, :b4, :e5], [0.5, 0.5, 0.5, 0.5], release: 0.5
+          sleep rrand(2, 5)
+        end
+        # Melodía inspirada en Mozart
+        live_loop :mozart_melody do
+          if finale
+            use_synth :piano
+            play_pattern_timed [:e4, :g4, :b4, :e5], [0.5, 0.5, 0.5, 0.5], release: 0.5
+            sleep 1
+          else
+            stop
+          end
+        end
+        
+        # Arpegios inspirados en Chopin
+        live_loop :chopin_arpeggios, sync: :mozart_melody do
+          if finale
+            use_synth :pretty_bell
+            play_pattern_timed chord(:e3, :m7), 0.25, release: 0.5
+            sleep 1
+          else
+            stop
+          end
+        end
+        
+        # Sonidos abstractos y postapocalípticos
+        live_loop :abstract_sounds, sync: :mozart_melody do
+          if finale
+            use_synth :saw
+            with_fx :distortion, distort: 0.7 do
+              play :e2, release: 2, cutoff: rrand(60, 120)
+              sleep 2
+            end
+          else
+            stop
+          end
+        end
+      end
+    end
+  end
+  
+end
