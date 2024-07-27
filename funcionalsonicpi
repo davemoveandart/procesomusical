@@ -10,12 +10,12 @@ distancia2 = 0
 distancia3 = 0
 
 # Duración total de la propuesta
-end_time = Time.now + 3 * 60
+end_time = Time.now + 5.5 * 60
 
 # Configuración para recibir mensajes OSC en Sonic Pi
 use_osc "192.168.1.84", 4560  # Dirección y puerto de Sonic Pi
 
-# Definir los manejadores para los mensajes OSC
+# Controles OSC
 live_loop :osc_listener1 do
   osc = sync "/osc*/sensor1"
   distancia1 = osc[0]
@@ -31,7 +31,7 @@ live_loop :osc_listener3 do
   distancia3 = osc[0]
 end
 
-# Configuración de efectos envolventes
+# Configuración de efectos
 define :play_chord_with_fx do |chord, vol|
   with_fx :reverb, mix: 0.6 do
     with_fx :slicer, phase: 0.25 do
@@ -44,7 +44,7 @@ end
 # Progresión de acordes con efectos
 live_loop :chord_progression do
   if Time.now < end_time
-    vol = [[(distancia3 - 20) / 25.0, 0].max, 1].min  # Mapeo de 20-45 a 0-1 para el volumen, asegurando que esté en el rango 0-1
+    vol = [[(distancia3 - 20) / 25.0, 0].max, 1].min  # Mapeo de 20-45 a 0-1 para el volumen
     play_chord_with_fx eb7_plus, vol
     play_chord_with_fx g7, vol
     play_chord_with_fx cm, vol
