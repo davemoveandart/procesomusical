@@ -90,6 +90,6 @@ end
 
 # Apagar a los 6 minutos
 live_loop :clock do
-  sleep 3 * 60
+  sleep 5.5 * 60
   stop
 end
